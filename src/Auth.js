@@ -7,6 +7,8 @@ class Auth extends React.Component{
 
     static phone_number = null;
 
+    static admin = null;
+
     static render() {
         return null;
     }

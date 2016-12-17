@@ -16,7 +16,8 @@ export default class SimpleDialog extends React.Component {
     state = {
         open: false,
         title : "Sign Success!",
-        description : "Press OK to redirect to Home."
+        description : "Press OK to redirect to Home.",
+        type : 'user',
     };
 
     handleOpen = () => {
@@ -26,14 +27,15 @@ export default class SimpleDialog extends React.Component {
     handleClose = () => {
         this.setState({open: false});
          if(this.props.onPress) {
-             this.props.onPress();
+             this.props.onPress(this.state.type);
          }
     };
 
-    setContent = (title, description) => {
+    setContent = (title, description, type) => {
         this.setState({
             title : title,
-            description : description
+            description : description,
+            type : type,
         });
     };
 

@@ -1,7 +1,7 @@
 /**
  * Created by kevin on 12/10/2016.
  */
-import React, { Component } from 'react';
+import React from 'react';
 import SimpleDialog from './Dialog';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
@@ -56,8 +56,11 @@ class Sign extends React.Component {
         });
     };
 
-    toHomePage() {
-        hashHistory.push('/Home');
+    redirect(type) {
+        if(type === 'admin')
+            hashHistory.push('/Admin');
+        else
+            hashHistory.push('/Home');
     };
 
     // 登录
@@ -68,18 +71,34 @@ class Sign extends React.Component {
          */
         if(this.state.phone_number === '10086'){
 
-            if(this.state.password != '10086') {
+            if(this.state.password !== '10086') {
                 this.setState({error_password : '密码错误！'});
                 return;
             }
 
-            this.refs.dialog.setContent('登录成功!', '点击确定后跳转到主页。');
+            this.refs.dialog.setContent('登录成功!', '点击确定后跳转到主页。', 'user');
             this.refs.dialog.handleOpen();
             //登录信息保存到本地
             window.localStorage.setItem('net', this.state.phone_number);
             Auth.phone_number = this.state.phone_number;
+            Auth.admin = null;
+            return;
+        }else if(this.state.phone_number === 'admin') {
+            if(this.state.password !== 'admin') {
+                this.setState({error_password : '密码错误！'});
+                return;
+            }
+
+            this.refs.dialog.setContent('登录成功!', '点击确定后跳转到主页。', 'admin');
+            this.refs.dialog.handleOpen();
+            //登录信息保存到本地
+            window.localStorage.setItem('net', this.state.phone_number);
+            Auth.admin = '管理员';
+            Auth.Home = null;
             return;
         }
+
+
 
 
         const URL = API.SignIn;
@@ -132,7 +151,7 @@ class Sign extends React.Component {
                                   primary={true}
                                   className="inputForm"
                                   onClick={this.onSignIn}/>
-                    <SimpleDialog ref="dialog" onPress={this.toHomePage}/>
+                    <SimpleDialog ref="dialog" onPress={this.redirect}/>
         </div>);
     }
 }

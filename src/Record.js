@@ -109,18 +109,18 @@ export default class Record extends React.Component {
 
     previousPage= () => {
         this.setState({
-            current_page : parseInt(this.state.current_page) - 1,
+            current_page : parseInt(this.state.current_page, 10) - 1,
             record : tableData_1,
             disableNextButton: false,
-            disablePreviousButton: ((parseInt(this.state.current_page) - 1) == 1),
+            disablePreviousButton: ((parseInt(this.state.current_page, 10) - 1) === 1),
         });
     };
 
     nextPage = () => {
         this.setState({
-            current_page : (parseInt(this.state.current_page) + 1),
+            current_page : (parseInt(this.state.current_page, 10) + 1),
             record : tableData_2,
-            disableNextButton: ((parseInt(this.state.current_page) + 1) == parseInt(this.state.all_pages)),
+            disableNextButton: ((parseInt(this.state.current_page, 10) + 1) === parseInt(this.state.all_pages, 10)),
             disablePreviousButton: false,
         });
     };

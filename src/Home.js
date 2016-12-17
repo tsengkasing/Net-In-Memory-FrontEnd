@@ -2,14 +2,13 @@
  * Created by kevin on 12/11/2016.
  */
 import React from 'react';
-import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'material-ui/Card';
+import {Card, CardHeader} from 'material-ui/Card';
 import {hashHistory } from 'react-router'
 import RaisedButton from 'material-ui/RaisedButton';
 import {List, ListItem} from 'material-ui/List';
 import FlatButton from 'material-ui/FlatButton';
 import Dialog from 'material-ui/Dialog';
 import {RadioButton, RadioButtonGroup} from 'material-ui/RadioButton'
-import TextField from 'material-ui/TextField';
 import Auth from './Auth'
 
 const styles = {
@@ -86,8 +85,8 @@ class Home extends React.Component {
     };
 
     componentWillMount() {
-        if(window.location.hash != '/Home')
-            hashHistory.push('/Home');
+        // if(window.location.hash !== '/Home')
+        //     hashHistory.push('/Home');
     };
 
     handleOpen = () => {
