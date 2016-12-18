@@ -8,31 +8,31 @@ import FlatButton from 'material-ui/FlatButton';
 
 const tableData_1 = [
     {
-        money: '100元',
+        amount: '100',
         time: '2016/12/27 12:56:00',
     },
     {
-        money: '200元',
+        amount: '200',
         time: '2016/11/05 11:23:00',
     },
     {
-        money: '30元',
+        amount: '30',
         time: '2016/10/15 14:34:00',
     },
     {
-        money: '50元',
+        amount: '50',
         time: '2016/09/05 12:45:00',
     },
     {
-        money: '10元',
+        amount: '10',
         time: '2016/08/21 21:33:00',
     },
     {
-        money: '200元',
+        amount: '200',
         time: '2016/07/03 22:34:00',
     },
     {
-        money: '500元',
+        amount: '500',
         time: '2016/05/05 10:09:00',
     },
 
@@ -40,15 +40,15 @@ const tableData_1 = [
 
 const tableData_2 = [
     {
-        money: '50元',
+        amount: '50',
         time: '2016/04/12 08:32:00',
     },
     {
-        money: '100元',
+        amount: '100',
         time: '2016/03/08 17:34:00',
     },
     {
-        money: '100元',
+        amount: '100',
         time: '2016/02/23 15:40:00',
     },
 
@@ -126,7 +126,7 @@ export default class RechargeRecord extends React.Component {
                         {this.state.record.map((row, index) => (
                             <TableRow key={index}>
                                 <TableRowColumn>{row.time}</TableRowColumn>
-                                <TableRowColumn style={{textAlign: 'right'}} >{row.money}</TableRowColumn>
+                                <TableRowColumn style={{textAlign: 'right'}} >{row.amount}元</TableRowColumn>
                             </TableRow>
                         ))}
                     </TableBody>

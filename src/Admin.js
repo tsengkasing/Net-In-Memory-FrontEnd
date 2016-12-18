@@ -26,12 +26,6 @@ class Admin extends React.Component {
         }
     }
 
-
-    componentWillMount() {
-        if(window.location.hash !== '/Admin')
-            hashHistory.push('/Admin');
-    };
-
     disableButton = (index) => {
         let status = [false, false, false, false];
         status[index] = true;

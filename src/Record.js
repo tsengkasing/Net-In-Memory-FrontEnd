@@ -146,7 +146,7 @@ export default class Record extends React.Component {
                             <TableHeaderColumn tooltip="主叫">主叫</TableHeaderColumn>
                             <TableHeaderColumn tooltip="被叫">被叫</TableHeaderColumn>
                             <TableHeaderColumn tooltip="呼叫时间">呼叫时间</TableHeaderColumn>
-                            <TableHeaderColumn tooltip="持续时间">持续时间</TableHeaderColumn>
+                            <TableHeaderColumn tooltip="通话时长">通话时长</TableHeaderColumn>
                             <TableHeaderColumn tooltip="消费金额">消费金额</TableHeaderColumn>
                         </TableRow>
                     </TableHeader>

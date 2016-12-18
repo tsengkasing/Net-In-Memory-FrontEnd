@@ -38,9 +38,6 @@ class Sign extends React.Component {
         };
     }
 
-    checkUsername = (event) => {
-
-    };
 
     inputUsername = (event) => {
         this.setState({
@@ -78,8 +75,6 @@ class Sign extends React.Component {
 
             this.refs.dialog.setContent('登录成功!', '点击确定后跳转到主页。', 'user');
             this.refs.dialog.handleOpen();
-            //登录信息保存到本地
-            window.localStorage.setItem('net', this.state.phone_number);
             Auth.phone_number = this.state.phone_number;
             Auth.admin = null;
             return;
@@ -91,8 +86,6 @@ class Sign extends React.Component {
 
             this.refs.dialog.setContent('登录成功!', '点击确定后跳转到主页。', 'admin');
             this.refs.dialog.handleOpen();
-            //登录信息保存到本地
-            window.localStorage.setItem('net', this.state.phone_number);
             Auth.admin = '管理员';
             Auth.Home = null;
             return;
@@ -102,24 +95,19 @@ class Sign extends React.Component {
 
 
         const URL = API.SignIn;
-        let callback = 'c'+Math.floor((Math.random()*100000000)+1);
         $.ajax({
             url : URL,
             type : 'POST',
-            jsonpCallback: callback, //specify callback name
-            contentType: 'application/json',
-            dataType: 'jsonp', //specify jsonp
             data : {
                 phone_number : this.state.phone_number,
-                passwd : this.state.password
+                password : this.state.password
             },
             success : function(data, textStatus, jqXHR) {
                 if(data.result){
                     this.refs.dialog.setContent('登录成功!', '点击确定后跳转到主页。');
                     this.refs.dialog.handleOpen();
-                    //登录信息保存到本地
-                    window.localStorage.setItem('net', this.state.phone_number);
-                    Auth.username = this.state.phone_number;
+
+                    Auth.phone_number = this.state.phone_number;
                 }
                 else this.setState({error_password: 'password not matched'});
             }.bind(this),
@@ -138,7 +126,6 @@ class Sign extends React.Component {
                                floatingLabelText="电话号码"
                                type="text"
                                errorText={this.state.error_phone_number}
-                               onBlur={this.checkUsername}
                                onChange={this.inputUsername}/>
                     <br/>
                     <TextField hintText="密码"

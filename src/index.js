@@ -35,8 +35,8 @@ ReactDOM.render((
                 <Route path="/Home/Recharge" component={RechargeRecord}/>
                 <Route path="/Home/Record" component={Record}/>
             </Route>
-            <Route path="/Admin" component={Admin}
-                   onEnter={()=>{if(Auth.admin == null) hashHistory.push('/Sign');}}>
+            <Route path="/Admin" component={Admin}>
+                   {/*onEnter={()=>{if(Auth.admin == null) hashHistory.push('/Sign');}}>*/}
                 <Route path="/Admin/CallTotalTime" component={CallTotalTime}/>
                 <Route path="/Admin/CallTotalAmount" component={CallTotalAmount}/>
                 <Route path="/Admin/CallDurationDistribution" component={CallDurationDistribution}/>

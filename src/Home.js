@@ -3,13 +3,15 @@
  */
 import React from 'react';
 import {Card, CardHeader} from 'material-ui/Card';
-import {hashHistory } from 'react-router'
+import {hashHistory } from 'react-router';
 import RaisedButton from 'material-ui/RaisedButton';
 import {List, ListItem} from 'material-ui/List';
 import FlatButton from 'material-ui/FlatButton';
 import Dialog from 'material-ui/Dialog';
-import {RadioButton, RadioButtonGroup} from 'material-ui/RadioButton'
-import Auth from './Auth'
+import {RadioButton, RadioButtonGroup} from 'material-ui/RadioButton';
+import $ from 'jquery';
+import API from './API';
+import Auth from './Auth';
 
 const styles = {
     button : {
@@ -75,7 +77,7 @@ class Home extends React.Component {
         super(props);
         this.state = {
             open: false,
-            money : '200.00',
+            amount : '200.00',
             plan : '预付费本地接听免费套餐',
             recharge : '10',
 
@@ -84,23 +86,62 @@ class Home extends React.Component {
         };
     };
 
+    getBalance = () => {
+        const URL = API.Balance;
+        $.ajax({
+            url : URL,
+            type : 'POST',
+            data : {
+                phone_number : this.state.phone_number
+            },
+            success : function(data, textStatus, jqXHR) {
+                this.setState({
+                    amount : data.amount,
+                    plan : data.plan
+                });
+            }.bind(this),
+            error : function(xhr, textStatus) {
+                console.log(xhr.status + '\n' + textStatus + '\n');
+            }
+        });
+    };
+
     componentWillMount() {
-        // if(window.location.hash !== '/Home')
-        //     hashHistory.push('/Home');
+        //this.getBalance();
     };
 
     handleOpen = () => {
         this.setState({open: true});
     };
 
+    handleRecharge = () => {
+        const URL = API.Balance;
+        $.ajax({
+            url : URL,
+            type : 'POST',
+            data : {
+                phone_number : this.state.phone_number,
+                amount : this.state.recharge
+            },
+            success : function(data, textStatus, jqXHR) {
+                this.setState({
+                    amount : (parseFloat(this.state.amount) + parseFloat(this.state.recharge)).toFixed(2),
+                    open: false,
+                    disableRechargeButton : false,
+                    disableCallingButton  : false
+                });
+                hashHistory.push('/Home');
+            }.bind(this),
+            error : function(xhr, textStatus) {
+                console.log(xhr.status + '\n' + textStatus + '\n');
+            }
+        });
+    };
+
     handleClose = () => {
         this.setState({
-            open: false,
-            money: (parseFloat(this.state.money) + parseFloat(this.state.recharge)).toFixed(2),
-            disableRechargeButton : false,
-            disableCallingButton  : false
+            open: false
         });
-        hashHistory.push('/Home');
     };
 
     handleChange = (event) => {
@@ -126,11 +167,15 @@ class Home extends React.Component {
     render() {
         const actions = [
             <FlatButton
-                label="充值"
+                label="取消"
                 primary={true}
-                keyboardFocused={true}
                 onTouchTap={this.handleClose}
             />,
+            <FlatButton
+                label="充值"
+                primary={true}
+                onTouchTap={this.handleRecharge}
+            />
         ];
 
 
@@ -144,7 +189,7 @@ class Home extends React.Component {
                         actAsExpander={true}
                     />
                     <List>
-                        <ListItem primaryText={'余额 : ' + this.state.money + '元'} rightIcon={<RaisedButton label="充值" primary={true} style={styles.button} onTouchTap={this.handleOpen} />} />
+                        <ListItem primaryText={'余额 : ' + this.state.amount + '元'} rightIcon={<RaisedButton label="充值" primary={true} style={styles.button} onTouchTap={this.handleOpen} />} />
                         <ListItem primaryText={'套餐 : ' + this.state.plan} />
                     </List>
                     <RaisedButton label="查询充值记录" primary={true} style={styles.button} onTouchTap={this.handleSearchRecharge} disabled={this.state.disableRechargeButton} />
