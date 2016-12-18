@@ -168,9 +168,9 @@ export default class Record extends React.Component {
                     >
                         <TableRow>
                             <TableRowColumn colSpan="5" style={{textAlign: 'center'}}>
-                                <FlatButton primary={true} label="previous" onTouchTap={this.previousPage} disabled={this.state.disablePreviousButton} />
+                                <FlatButton primary={true} label="上一页" onTouchTap={this.previousPage} disabled={this.state.disablePreviousButton} />
                                 {this.state.current_page}/{this.state.all_pages}
-                                <FlatButton primary={true} label="next" onTouchTap={this.nextPage} disabled={this.state.disableNextButton} />
+                                <FlatButton primary={true} label="下一页" onTouchTap={this.nextPage} disabled={this.state.disableNextButton} />
                             </TableRowColumn>
                         </TableRow>
                     </TableFooter>
