@@ -6,6 +6,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import {BarChart, Bar, Brush, ReferenceLine, XAxis, YAxis, CartesianGrid, Tooltip, Legend} from 'recharts';
 import DatePicker from 'material-ui/DatePicker';
 import $ from 'jquery';
+import WarningDialog from './WarningDialog';
 
 
 const styles = {
@@ -87,8 +88,10 @@ class CallTotalamount extends React.Component {
     handleSearch = () => {
         let from = $('#from').val();
         let to = $('#to').val();
-        if((from === '') || (to === '') || (from === to))
-            alert('时间范围选择不正确!');
+        if((from === '') || (to === ''))
+            this.refs.warning.handleOpen('提示', '请选择开始日期和结束日期。');
+        else if(from === to)
+            this.refs.warning.handleOpen('提示', '请至少查询两天。');
         else
             console.log('from :' + from + '\nto :' + to);
     };
@@ -134,6 +137,7 @@ class CallTotalamount extends React.Component {
                     <Brush dataKey='time' height={30} stroke="#8884d8"/>
                     <Bar dataKey="amount" fill="#8884d8" />
                 </BarChart>
+                <WarningDialog ref="warning"/>
             </div>
         );
     }

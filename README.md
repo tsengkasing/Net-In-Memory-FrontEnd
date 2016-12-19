@@ -231,8 +231,8 @@ UrlPattern = "/newuser"
 [POST]
 @request
 {
-	from : {"yyyy-mm-dd"},
-	to : {"yyyy-mm-dd"}
+	from : {"yyyy-mm"},
+	to : {"yyyy-mm"}
 }
 
 @response
