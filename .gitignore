@@ -1,2 +1,7 @@
-# itellij IDEA iml File
-*.iml
+
+.idea/
+
+node_modules/
+
+build/
+

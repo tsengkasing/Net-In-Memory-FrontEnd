@@ -31,7 +31,7 @@ example ：<br>
 ### 1.登录
 
 ```
-UrlPattern = "/signin"
+UrlPattern = "/api/signin"
 
 [POST]
 @request
@@ -49,7 +49,7 @@ UrlPattern = "/signin"
 ### 2.查询余额
 
 ```
-UrlPattern = "/balance"]
+UrlPattern = "/api/balance"]
 
 [POST]
 @request
@@ -67,7 +67,7 @@ UrlPattern = "/balance"]
 ### 3.充值
 
 ```
-UrlPattern = "/recharge"
+UrlPattern = "/api/recharge"
 
 [POST]
 @request
@@ -89,7 +89,7 @@ UrlPattern = "/recharge"
 >begin表示从第几个开始(minValue = 0)，然后返回接着的10条记录(少于10条则返回真实数量条目)
 
 ```
-UrlPattern = "/rechargerecord"
+UrlPattern = "/api/rechargerecord"
 
 [POST]
 @request
@@ -115,7 +115,7 @@ UrlPattern = "/rechargerecord"
 ### 5.查询流水
 
 ```
-UrlPattern = "/record"
+UrlPattern = "/api/record"
 
 [POST]
 @request
@@ -148,7 +148,7 @@ UrlPattern = "/record"
 ### 6.查询通话量
 
 ```
-UrlPattern = "/calltotaltime"
+UrlPattern = "/api/calltotaltime"
 
 [POST]
 @request
@@ -174,7 +174,7 @@ UrlPattern = "/calltotaltime"
 ### 7.查询通话总额
 
 ```
-UrlPattern = "/calltotalamount"
+UrlPattern = "/api/calltotalamount"
 
 [POST]
 @request
@@ -200,7 +200,7 @@ UrlPattern = "/calltotalamount"
 ### 8.查询通话时长分布
 
 ```
-UrlPattern = "/callduration"
+UrlPattern = "/api/callduration"
 
 [POST]
 @request
@@ -226,7 +226,7 @@ UrlPattern = "/callduration"
 ### 9.查询新增用户量
 
 ```
-UrlPattern = "/newuser"
+UrlPattern = "/api/newuser"
 
 [POST]
 @request
