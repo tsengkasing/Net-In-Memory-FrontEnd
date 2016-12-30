@@ -77,8 +77,8 @@ class Home extends React.Component {
         super(props);
         this.state = {
             open: false,
-            amount : '200.00',
-            plan : '预付费本地接听免费套餐',
+            balance : 0,
+            plan : '',
             recharge : '10',
 
             disableRechargeButton : false,
@@ -87,17 +87,20 @@ class Home extends React.Component {
     };
 
     getBalance = () => {
-        const URL = API.Balance;
+        const URL = API.TimesTen + API.Balance;
+        const data = {
+            phone_number : Auth.phone_number
+        };
         $.ajax({
             url : URL,
             type : 'POST',
-            data : {
-                phone_number : this.state.phone_number
-            },
+            contentType : 'application/json',
+            data : JSON.stringify(data),
             success : function(data, textStatus, jqXHR) {
+                console.log(data);
                 this.setState({
-                    amount : data.amount,
-                    plan : data.plan
+                    balance : data.balance,
+                    plan : data.plan.description
                 });
             }.bind(this),
             error : function(xhr, textStatus) {
@@ -107,7 +110,7 @@ class Home extends React.Component {
     };
 
     componentWillMount() {
-        //this.getBalance();
+        this.getBalance();
     };
 
     handleOpen = () => {
@@ -115,22 +118,26 @@ class Home extends React.Component {
     };
 
     handleRecharge = () => {
-        const URL = API.Balance;
+        const URL = API.TimesTen + API.Recharge;
+        const data = {
+            phone_number : Auth.phone_number,
+            amount : this.state.recharge
+        };
         $.ajax({
             url : URL,
             type : 'POST',
-            data : {
-                phone_number : this.state.phone_number,
-                amount : this.state.recharge
-            },
+            data : JSON.stringify(data),
+            contentType : 'application/json',
             success : function(data, textStatus, jqXHR) {
+                console.log(data);
                 this.setState({
-                    amount : (parseFloat(this.state.amount) + parseFloat(this.state.recharge)).toFixed(2),
+                    // balance : (parseFloat(this.state.balance) + parseFloat(this.state.recharge)).toFixed(2),
                     open: false,
                     disableRechargeButton : false,
                     disableCallingButton  : false
                 });
                 hashHistory.push('/Home');
+                this.getBalance();
             }.bind(this),
             error : function(xhr, textStatus) {
                 console.log(xhr.status + '\n' + textStatus + '\n');
@@ -189,7 +196,7 @@ class Home extends React.Component {
                         actAsExpander={true}
                     />
                     <List>
-                        <ListItem primaryText={'余额 : ' + this.state.amount + '元'} rightIcon={<RaisedButton label="充值" primary={true} style={styles.button} onTouchTap={this.handleOpen} />} />
+                        <ListItem primaryText={'余额 : ' + parseInt(this.state.balance, 10).toFixed(2) + ' 元'} rightIcon={<RaisedButton label="充值" primary={true} style={styles.button} onTouchTap={this.handleOpen} />} />
                         <ListItem primaryText={'套餐 : ' + this.state.plan} />
                     </List>
                     <RaisedButton label="查询充值记录" primary={true} style={styles.button} onTouchTap={this.handleSearchRecharge} disabled={this.state.disableRechargeButton} />

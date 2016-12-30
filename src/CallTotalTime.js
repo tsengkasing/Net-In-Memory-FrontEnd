@@ -9,13 +9,8 @@ import $ from 'jquery';
 import WarningDialog from './WarningDialog';
 
 const styles = {
-    Title : {
+    Center : {
         textAlign:'center',
-    },
-    Graph : {
-        textAlign:'center',
-    },
-    Container : {
     },
 };
 
@@ -98,8 +93,8 @@ class CalltotalTime extends React.Component {
 
     render() {
         return(
-            <div style={styles.Container}>
-                <h3 style={styles.Title}>通话总量</h3>
+            <div>
+                <h3 style={styles.Center}>通话总量</h3>
                 <div>
                     <h4>选择查询时间段</h4>
                     <DatePicker hintText="开始日期"
@@ -125,7 +120,7 @@ class CalltotalTime extends React.Component {
                 </div>
                 <BarChart width={1024}
                           height={512}
-                          style={styles.Graph}
+                          style={styles.Center}
                           data={this.state.data}
                           margin={{top: 5, right: 30, left: 20, bottom: 5}}>
                     <XAxis label="时间/月" dataKey="time"/>

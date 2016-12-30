@@ -30,8 +30,8 @@ class Sign extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            phone_number : null,
-            password : null,
+            phone_number : '13498031936',
+            password : '89f7hqnV',
 
             error_phone_number : null,
             error_password : null
@@ -94,15 +94,18 @@ class Sign extends React.Component {
 
 
 
-        const URL = API.SignIn;
+        const URL = API.TimesTen + API.SignIn;
+        const data = {
+            phone_number : this.state.phone_number,
+            password : this.state.password
+        };
         $.ajax({
             url : URL,
             type : 'POST',
-            data : {
-                phone_number : this.state.phone_number,
-                password : this.state.password
-            },
+            contentType : 'application/json',
+            data : JSON.stringify(data),
             success : function(data, textStatus, jqXHR) {
+                console.log(data);
                 if(data.result){
                     this.refs.dialog.setContent('登录成功!', '点击确定后跳转到主页。');
                     this.refs.dialog.handleOpen();
@@ -126,12 +129,14 @@ class Sign extends React.Component {
                                floatingLabelText="电话号码"
                                type="text"
                                errorText={this.state.error_phone_number}
+                               value={this.state.phone_number}
                                onChange={this.inputUsername}/>
                     <br/>
                     <TextField hintText="密码"
                                floatingLabelText="密码"
                                type="password"
                                errorText={this.state.error_password}
+                               value={this.state.password}
                                onChange={this.inputPassword}/>
                     <br/><br/>
                     <RaisedButton label="登录"

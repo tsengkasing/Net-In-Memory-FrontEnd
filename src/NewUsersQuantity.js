@@ -4,7 +4,7 @@
 import React from 'react';
 import RaisedButton from 'material-ui/RaisedButton';
 import {LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend} from 'recharts';
-import $ from 'jquery';
+// import $ from 'jquery';
 import WarningDialog from './WarningDialog';
 
 const styles = {
