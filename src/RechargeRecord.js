@@ -8,6 +8,7 @@ import FlatButton from 'material-ui/FlatButton';
 import $ from 'jquery';
 import Auth from './Auth';
 import API from './API';
+import StoreModelCompare from './StoreModelCompare';
 
 export default class RechargeRecord extends React.Component {
 
@@ -22,30 +23,66 @@ export default class RechargeRecord extends React.Component {
 
             disablePreviousButton : true,
             disableNextButton : true,
+
+            loaded : false,
         };
     }
 
     getRechargeRecord = () => {
-        const URL = API.TimesTen + API.RechargeRecord;
+        this.refs.CompareExecutionTimeGraph.reset();
+        this.setState({loaded : false});
         const data = {
             phone_number : Auth.phone_number,
             begin : 0
         };
+
+        const TT_URL = API.TimesTen + API.RechargeRecord;
         $.ajax({
-            url : URL,
+            url : TT_URL,
             type : 'POST',
             data : JSON.stringify(data),
             contentType : 'application/json',
             success : function(data, textStatus, jqXHR) {
                 console.log(data);
-                let current_list = data.slice(0, 10);
-                let pages_num = parseInt((data.length / 10), 10) + ((data.length % 10 > 0) ? 1 : 0);
+                this.refs.CompareExecutionTimeGraph.displayTimesTen(data.queryTime);
+                if(this.state.loaded) return;
+                let list = data.result;
+                let current_list = list.slice(0, 10);
+                let pages_num = parseInt((list.length / 10), 10) + ((list.length % 10 > 0) ? 1 : 0);
                 this.setState({
-                    record: data,
+                    record: list,
                     pages_num: pages_num,
                     current_page: 1,
                     current_list: current_list,
                     disableNextButton: pages_num <= 1,
+                    loaded : true,
+                });
+            }.bind(this),
+            error : function(xhr, textStatus) {
+                console.log(xhr.status + '\n' + textStatus + '\n');
+            }
+        });
+
+        const Oracle_URL = API.Oracle + API.RechargeRecord;
+        $.ajax({
+            url : Oracle_URL,
+            type : 'POST',
+            data : JSON.stringify(data),
+            contentType : 'application/json',
+            success : function(data, textStatus, jqXHR) {
+                console.log(data);
+                this.refs.CompareExecutionTimeGraph.displayOracle(data.queryTime);
+                if(this.state.loaded) return;
+                let list = data.result;
+                let current_list = list.slice(0, 10);
+                let pages_num = parseInt((list.length / 10), 10) + ((list.length % 10 > 0) ? 1 : 0);
+                this.setState({
+                    record: list,
+                    pages_num: pages_num,
+                    current_page: 1,
+                    current_list: current_list,
+                    disableNextButton: pages_num <= 1,
+                    loaded : true,
                 });
             }.bind(this),
             error : function(xhr, textStatus) {
@@ -54,7 +91,7 @@ export default class RechargeRecord extends React.Component {
         });
     };
 
-    componentWillMount() {
+    componentDidMount() {
         this.getRechargeRecord();
     };
 
@@ -127,6 +164,7 @@ export default class RechargeRecord extends React.Component {
                         </TableRow>
                     </TableFooter>
                 </Table>
+                <StoreModelCompare ref="CompareExecutionTimeGraph" />
             </div>
         );
     }

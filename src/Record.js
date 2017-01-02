@@ -8,6 +8,7 @@ import FlatButton from 'material-ui/FlatButton';
 import $ from 'jquery';
 import Auth from './Auth';
 import API from './API';
+import StoreModelCompare from './StoreModelCompare';
 
 const styles = {
     table : {
@@ -23,58 +24,6 @@ const styles = {
     }
 };
 
-const tableData_1 = [
-    {
-        caller: '18221087115',
-        called: '18201987108',
-        call_time:'2016/12/5 12:56:00',
-        dur_time : 4535,
-        cost : '0.47',
-    },
-    {
-        caller: '18221087115',
-        called: '18201987108',
-        call_time:'2016/12/5 12:56:00',
-        dur_time : 3600,
-        cost : '0.19',
-    },
-    {
-        caller: '18221087115',
-        called: '18201987108',
-        call_time:'2016/12/5 12:56:00',
-        dur_time : 60,
-        cost : '0.19',
-    },
-    {
-        caller: '18221087115',
-        called: '18201987108',
-        call_time:'2016/12/5 12:56:00',
-        dur_time : '120',
-        cost : '0.38',
-    },
-    {
-        caller: '18221087115',
-        called: '18201987108',
-        call_time:'2016/12/5 12:56:00',
-        dur_time : 60 * 60 * 23 + 61,
-        cost : '0.19',
-    },
-    {
-        caller: '18221087115',
-        called: '18201987108',
-        call_time:'2016/12/5 12:56:00',
-        dur_time : 60 * 60 * 72,
-        cost : '0.19',
-    },
-    {
-        caller: '18221087115',
-        called: '18201987108',
-        call_time:'2016/12/5 12:56:00',
-        dur_time : 60 * 60 * 24 + 61 + 60 * 62,
-        cost : '0.19',
-    },
-];
-
 export default class Record extends React.Component {
 
     constructor(props) {
@@ -86,26 +35,59 @@ export default class Record extends React.Component {
             record : [],
             disablePreviousButton : true,
             disableNextButton : true,
+            loaded : false,
         };
     }
 
     getCallRecord = () => {
-        const URL = API.TimesTen + API.Record;
+        this.refs.CompareExecutionTimeGraph.reset();
+        this.setState({loaded : false});
         const data = {
             phone_number : Auth.phone_number,
             begin : 0
         };
+
+        const TT_URL = API.TimesTen + API.Record;
         $.ajax({
-            url : URL,
+            url : TT_URL,
             type : 'POST',
             data : JSON.stringify(data),
             contentType : 'application/json',
             success : function(data, textStatus, jqXHR) {
                 console.log(data);
-                let current_list = data.slice(0, 10);
-                let pages_num = parseInt((data.length / 10), 10) + ((data.length % 10 > 0) ? 1 : 0);
+                this.refs.CompareExecutionTimeGraph.displayTimesTen(data.queryTime);
+                if(this.state.loaded) return;
+                let list = data.result;
+                let current_list = list.slice(0, 10);
+                let pages_num = parseInt((list.length / 10), 10) + ((list.length % 10 > 0) ? 1 : 0);
                 this.setState({
-                    record: data,
+                    record: list,
+                    pages_num: pages_num,
+                    current_page: 1,
+                    current_list: current_list,
+                    disableNextButton: pages_num <= 1,
+                });
+            }.bind(this),
+            error : function(xhr, textStatus) {
+                console.log(xhr.status + '\n' + textStatus + '\n');
+            }
+        });
+
+        const Oracle_URL = API.Oracle+ API.Record;
+        $.ajax({
+            url : Oracle_URL,
+            type : 'POST',
+            data : JSON.stringify(data),
+            contentType : 'application/json',
+            success : function(data, textStatus, jqXHR) {
+                console.log(data);
+                this.refs.CompareExecutionTimeGraph.displayOracle(data.queryTime);
+                if(this.state.loaded) return;
+                let list = data.result;
+                let current_list = list.slice(0, 10);
+                let pages_num = parseInt((list.length / 10), 10) + ((list.length % 10 > 0) ? 1 : 0);
+                this.setState({
+                    record: list,
                     pages_num: pages_num,
                     current_page: 1,
                     current_list: current_list,
@@ -118,12 +100,8 @@ export default class Record extends React.Component {
         });
     };
 
-    componentWillMount() {
+    componentDidMount() {
         this.getCallRecord();
-        // this.setState({
-        //     current_page: 1,
-        //     current_list: tableData_1,
-        // });
     };
 
     parseDuration = (seconds) => {
@@ -204,7 +182,7 @@ export default class Record extends React.Component {
                                 <TableRowColumn>{row.called}</TableRowColumn>
                                 <TableRowColumn>{row.call_time}</TableRowColumn>
                                 <TableRowColumn>{this.parseDuration(row.dur_time)}</TableRowColumn>
-                                <TableRowColumn>{row.cost}元</TableRowColumn>
+                                <TableRowColumn>{row.cost.toFixed(2)}元</TableRowColumn>
                             </TableRow>
                         ))}
                     </TableBody>
@@ -220,6 +198,7 @@ export default class Record extends React.Component {
                         </TableRow>
                     </TableFooter>
                 </Table>
+                <StoreModelCompare ref="CompareExecutionTimeGraph" />
             </div>
         );
     }

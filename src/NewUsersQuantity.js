@@ -4,8 +4,10 @@
 import React from 'react';
 import RaisedButton from 'material-ui/RaisedButton';
 import {LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend} from 'recharts';
-// import $ from 'jquery';
+import $ from 'jquery';
 import WarningDialog from './WarningDialog';
+import StoreModelCompare from './StoreModelCompare';
+import API from './API';
 
 const styles = {
     Title : {
@@ -16,21 +18,6 @@ const styles = {
     },
 };
 
-const data = [
-    {time: '2016-01', quantity: 1398},
-    {time: '2016-02', quantity: 2400},
-    {time: '2016-03', quantity: 3908},
-    {time: '2016-04', quantity: 4256},
-    {time: '2016-05', quantity: 4800},
-    {time: '2016-06', quantity: 5890},
-    {time: '2016-07', quantity: 6793},
-    {time: '2016-08', quantity: 8453},
-    {time: '2016-09', quantity: 8890},
-    {time: '2016-10', quantity: 9210},
-    {time: '2016-11', quantity: 10041},
-    {time: '2016-12', quantity: 11211},
-];
-
 class NewUsersQuantity extends React.Component {
 
     constructor(props) {
@@ -40,15 +27,61 @@ class NewUsersQuantity extends React.Component {
             data : [],
             today : "",
             from : "",
-            to : ""
+            to : "",
+            loaded : false,
         };
     }
 
-    componentWillMount() {
-        this.setState({
-            data : data
+    loadData = (from, to) => {
+        const data = {
+            from : from,
+            to : to,
+        };
+
+        const TT_URL = API.TimesTen + API.NewUser;
+        $.ajax({
+            url : TT_URL,
+            type : 'POST',
+            data : JSON.stringify(data),
+            contentType : 'application/json',
+            success : function(data, textStatus, jqXHR) {
+                console.log(data);
+                this.refs.CompareExecutionTimeGraph.displayTimesTen(data.queryTime);
+                if(this.state.loaded) return;
+                let list = data.result;
+                list.sort(API.sort_month);
+                this.setState({
+                    data : list,
+                    loaded : true,
+                });
+            }.bind(this),
+            error : function(xhr, textStatus) {
+                console.log(xhr.status + '\n' + textStatus + '\n');
+            }
         });
-    }
+
+        const Oracle_URL = API.Oracle + API.NewUser;
+        $.ajax({
+            url : Oracle_URL,
+            type : 'POST',
+            data : JSON.stringify(data),
+            contentType : 'application/json',
+            success : function(data, textStatus, jqXHR) {
+                console.log(data);
+                this.refs.CompareExecutionTimeGraph.displayOracle(data.queryTime);
+                if(this.state.loaded) return;
+                let list = data.result;
+                list.sort(API.sort_month);
+                this.setState({
+                    data : list,
+                    loaded : true,
+                });
+            }.bind(this),
+            error : function(xhr, textStatus) {
+                console.log(xhr.status + '\n' + textStatus + '\n');
+            }
+        });
+    };
 
     handleInputFrom = (event, date) => {
         //this.setState({from : date});
@@ -62,6 +95,8 @@ class NewUsersQuantity extends React.Component {
     };
 
     handleSearch = () => {
+        this.refs.CompareExecutionTimeGraph.reset();
+        this.setState({loaded : false});
         //let from = $('#from').val();
         let from = this.state.from;
         //let to = $('#to').val();
@@ -70,8 +105,10 @@ class NewUsersQuantity extends React.Component {
             this.refs.warning.handleOpen('提示', '请选择开始月份和结束月份。');
         else if(from === to)
             this.refs.warning.handleOpen('提示', '请至少查询两个月。');
-        else
+        else {
             console.log('from :' + from + '\nto :' + to);
+            this.loadData(from + '-01', to + '-01');
+        }
     };
 
     render() {
@@ -112,6 +149,7 @@ class NewUsersQuantity extends React.Component {
                     {/*<Line type="monotone" dataKey="uv" stroke="#82ca9d" />*/}
                 </LineChart>
                 <WarningDialog ref="warning" />
+                <StoreModelCompare ref="CompareExecutionTimeGraph" />
             </div>
         );
     }

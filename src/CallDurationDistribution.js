@@ -5,6 +5,9 @@ import React from 'react';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 import {ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip} from 'recharts';
+import API from './API';
+import $ from 'jquery';
+import StoreModelCompare from './StoreModelCompare';
 
 const styles = {
     Title : {
@@ -19,22 +22,6 @@ const styles = {
     },
 };
 
-const data = [
-    {duration: 1, quantity: 1000},
-    {duration: 2, quantity: 100},
-    {duration: 3, quantity: 40},
-    {duration: 4, quantity: 600},
-    {duration: 5, quantity: 300},
-    {duration: 10, quantity: 300},
-    {duration: 20, quantity: 700},
-    {duration: 25, quantity: 230},
-    {duration: 30, quantity: 250},
-    {duration: 35, quantity: 560},
-    {duration: 40, quantity: 250},
-    {duration: 45, quantity: 400},
-    {duration: 60, quantity: 280},
-    ];
-
 class CallDurationDistribution extends React.Component {
 
     constructor(props) {
@@ -42,15 +29,59 @@ class CallDurationDistribution extends React.Component {
         this.state = {
             data : [],
             from : 1,
-            to : 2
+            to : 2,
+            loaded : false,
         };
     }
 
-    componentWillMount() {
-        this.setState({
-            data : data,
+    loadData = (from, to) => {
+        const data = {
+            from : from,
+            to : to,
+        };
+
+        const TT_URL = API.TimesTen + API.CallDuration;
+        $.ajax({
+            url : TT_URL,
+            type : 'POST',
+            data : JSON.stringify(data),
+            contentType : 'application/json',
+            success : function(data, textStatus, jqXHR) {
+                console.log(data);
+                this.refs.CompareExecutionTimeGraph.displayTimesTen(data.queryTime);
+                if(this.state.loaded) return;
+                let list = data.result;
+                this.setState({
+                    data : list,
+                    loaded : true,
+                });
+            }.bind(this),
+            error : function(xhr, textStatus) {
+                console.log(xhr.status + '\n' + textStatus + '\n');
+            }
         });
-    }
+
+        const Oracle_URL = API.Oracle + API.CallDuration;
+        $.ajax({
+            url : Oracle_URL,
+            type : 'POST',
+            data : JSON.stringify(data),
+            contentType : 'application/json',
+            success : function(data, textStatus, jqXHR) {
+                console.log(data);
+                this.refs.CompareExecutionTimeGraph.displayOracle(data.queryTime);
+                if(this.state.loaded) return;
+                let list = data.result;
+                this.setState({
+                    data : list,
+                    loaded : true,
+                });
+            }.bind(this),
+            error : function(xhr, textStatus) {
+                console.log(xhr.status + '\n' + textStatus + '\n');
+            }
+        });
+    };
 
     handleInput = (event) => {
         let value = event.target.value;
@@ -65,7 +96,10 @@ class CallDurationDistribution extends React.Component {
     };
 
     handleSearch = () => {
+        this.refs.CompareExecutionTimeGraph.reset();
+        this.setState({loaded : false});
         console.log('from :' + this.state.from + '\nto :' + this.state.to);
+        this.loadData(this.state.from, this.state.to);
     };
 
     render() {
@@ -104,6 +138,7 @@ class CallDurationDistribution extends React.Component {
                     <CartesianGrid />
                     <Tooltip cursor={{strokeDasharray: '3 3'}}/>
                 </ScatterChart>
+                <StoreModelCompare ref="CompareExecutionTimeGraph" />
             </div>
         );
     }

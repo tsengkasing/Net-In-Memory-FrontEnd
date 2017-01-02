@@ -7,50 +7,14 @@ import {BarChart, Bar, Brush, ReferenceLine, XAxis, YAxis, CartesianGrid, Toolti
 import DatePicker from 'material-ui/DatePicker';
 import $ from 'jquery';
 import WarningDialog from './WarningDialog';
+import StoreModelCompare from './StoreModelCompare';
+import API from './API';
 
 const styles = {
     Center : {
         textAlign:'center',
     },
 };
-
-const data = [
-    {time: '2016-11-01', totalTime: 300},
-    {time: '2016-11-02', totalTime: 145},
-    {time: '2016-11-04', totalTime: 100},
-    {time: '2016-11-05', totalTime: 8},
-    {time: '2016-11-06', totalTime: 100},
-    {time: '2016-11-07', totalTime: 9},
-    {time: '2016-11-08', totalTime: 53},
-    {time: '2016-11-09', totalTime: 252},
-    {time: '2016-11-10', totalTime: 79},
-    {time: '2016-11-11', totalTime: 294},
-    {time: '2016-11-12', totalTime: 43},
-    {time: '2016-11-13', totalTime: 74},
-    {time: '2016-11-14', totalTime: 89},
-    {time: '2016-11-15', totalTime: 117},
-    {time: '2016-11-16', totalTime: 186},
-    {time: '2016-11-17', totalTime: 16},
-    {time: '2016-11-18', totalTime: 125},
-    {time: '2016-11-19', totalTime: 222},
-    {time: '2016-11-20', totalTime: 372},
-    {time: '2016-11-21', totalTime: 182},
-    {time: '2016-11-22', totalTime: 164},
-    {time: '2016-11-23', totalTime: 316},
-    {time: '2016-11-24', totalTime: 131},
-    {time: '2016-11-25', totalTime: 291},
-    {time: '2016-11-26', totalTime: 47},
-    {time: '2016-11-27', totalTime: 415},
-    {time: '2016-11-28', totalTime: 182},
-    {time: '2016-11-29', totalTime: 93},
-    {time: '2016-11-30', totalTime: 99},
-    {time: '2016-12-01', totalTime: 52},
-    {time: '2016-12-02', totalTime: 154},
-    {time: '2016-12-03', totalTime: 205},
-    {time: '2016-12-04', totalTime: 70},
-    {time: '2016-12-05', totalTime: 25},
-    {time: '2016-12-06', totalTime: 59},
-];
 
 class CalltotalTime extends React.Component {
 
@@ -60,17 +24,68 @@ class CalltotalTime extends React.Component {
         this.state = {
             data : [],
             today : today,
-            from : today,
-            to : null
+            from : null,
+            to : today,
+            loaded : false,
         };
     }
 
-    componentWillMount() {
-        this.setState({
-            data : data,
-        });
-    }
+    loadData = (from, to) => {
+        const data = {
+            from : from,
+            to : to,
+        };
 
+        const TT_URL = API.TimesTen + API.CallTotalTime;
+        $.ajax({
+            url : TT_URL,
+            type : 'POST',
+            data : JSON.stringify(data),
+            contentType : 'application/json',
+            success : function(data, textStatus, jqXHR) {
+                console.log(data);
+                this.refs.CompareExecutionTimeGraph.displayTimesTen(data.queryTime);
+                if(this.state.loaded) return;
+                let list = data.result;
+                list.sort(API.sort_date);
+                for(let i = 0; i < list.length; i++) {
+                    list[i].totalTime = parseInt(list[i].totalTime / 60);
+                }
+                this.setState({
+                    data : list,
+                    loaded : true,
+                });
+            }.bind(this),
+            error : function(xhr, textStatus) {
+                console.log(xhr.status + '\n' + textStatus + '\n');
+            }
+        });
+
+        const Oracle_URL = API.Oracle + API.CallTotalTime;
+        $.ajax({
+            url : Oracle_URL,
+            type : 'POST',
+            data : JSON.stringify(data),
+            contentType : 'application/json',
+            success : function(data, textStatus, jqXHR) {
+                console.log(data);
+                this.refs.CompareExecutionTimeGraph.displayOracle(data.queryTime);
+                if(this.state.loaded) return;
+                let list = data.result;
+                list.sort(API.sort_date);
+                for(let i = 0; i < list.length; i++) {
+                    list[i].totalTime = parseInt(list[i].totalTime / 60);
+                }
+                this.setState({
+                    data : list,
+                    loaded : true,
+                });
+            }.bind(this),
+            error : function(xhr, textStatus) {
+                console.log(xhr.status + '\n' + textStatus + '\n');
+            }
+        });
+    };
 
     handleInputFrom = (event, date) => {
         this.setState({from : date});
@@ -81,14 +96,18 @@ class CalltotalTime extends React.Component {
     };
 
     handleSearch = () => {
+        this.refs.CompareExecutionTimeGraph.reset();
+        this.setState({loaded : false});
         let from = $('#from').val();
         let to = $('#to').val();
         if((from === '') || (to === ''))
             this.refs.warning.handleOpen('提示', '请选择开始日期和结束日期。');
         else if(from === to)
             this.refs.warning.handleOpen('提示', '请至少查询两天。');
-        else
+        else {
             console.log('from :' + from + '\nto :' + to);
+            this.loadData(from ,to);
+        }
     };
 
     render() {
@@ -103,7 +122,7 @@ class CalltotalTime extends React.Component {
                                   mode="landscape"
                                   value={this.state.from}
                                   onChange={this.handleInputFrom}
-                                  maxDate={this.state.today}
+                                  maxDate={this.state.to}
                                   id="from"/>
                     <DatePicker hintText="结束日期"
                                   okLabel="确定"
@@ -133,6 +152,7 @@ class CalltotalTime extends React.Component {
                     <Bar dataKey="totalTime" fill="#82ca9d" />
                 </BarChart>
                 <WarningDialog ref="warning"/>
+                <StoreModelCompare ref="CompareExecutionTimeGraph" />
             </div>
         );
     }

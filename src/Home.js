@@ -12,6 +12,7 @@ import {RadioButton, RadioButtonGroup} from 'material-ui/RadioButton';
 import $ from 'jquery';
 import API from './API';
 import Auth from './Auth';
+import StoreModelCompare from './StoreModelCompare';
 
 const styles = {
     button : {
@@ -63,11 +64,11 @@ const radios = [
         value: '500',
         label: '500元',
     },
-    {
-        key: '9',
-        value: '1000000',
-        label: '1,000,000元 [测试用]',
-    },
+    // {
+    //     key: '9',
+    //     value: '1000000',
+    //     label: '1,000,000元 [测试用]',
+    // },
 ];
 
 class Home extends React.Component {
@@ -83,24 +84,56 @@ class Home extends React.Component {
 
             disableRechargeButton : false,
             disableCallingButton : false,
+
+            loaded : false,
         };
     };
 
     getBalance = () => {
-        const URL = API.TimesTen + API.Balance;
+        this.refs.CompareExecutionTimeGraph.reset();
+        this.setState({loaded : false});
+
         const data = {
             phone_number : Auth.phone_number
         };
+
+        const TT_URL = API.TimesTen + API.Balance;
         $.ajax({
-            url : URL,
+            url : TT_URL,
             type : 'POST',
             contentType : 'application/json',
             data : JSON.stringify(data),
             success : function(data, textStatus, jqXHR) {
                 console.log(data);
+                this.refs.CompareExecutionTimeGraph.displayTimesTen(data.queryTime);
+                if(this.state.loaded) return;
+                let obj = data.result;
                 this.setState({
-                    balance : data.balance,
-                    plan : data.plan.description
+                    balance : obj.balance,
+                    plan : obj.plan.description,
+                    loaded : true,
+                });
+            }.bind(this),
+            error : function(xhr, textStatus) {
+                console.log(xhr.status + '\n' + textStatus + '\n');
+            }
+        });
+
+        const Oracle_URL = API.Oracle + API.Balance;
+        $.ajax({
+            url : Oracle_URL,
+            type : 'POST',
+            contentType : 'application/json',
+            data : JSON.stringify(data),
+            success : function(data, textStatus, jqXHR) {
+                console.log(data);
+                this.refs.CompareExecutionTimeGraph.displayOracle(data.queryTime);
+                if(this.state.loaded) return;
+                let obj = data.result;
+                this.setState({
+                    balance : obj.balance,
+                    plan : obj.plan.description,
+                    loaded : true,
                 });
             }.bind(this),
             error : function(xhr, textStatus) {
@@ -109,7 +142,7 @@ class Home extends React.Component {
         });
     };
 
-    componentWillMount() {
+    componentDidMount() {
         this.getBalance();
     };
 
@@ -118,13 +151,13 @@ class Home extends React.Component {
     };
 
     handleRecharge = () => {
-        const URL = API.TimesTen + API.Recharge;
         const data = {
             phone_number : Auth.phone_number,
             amount : this.state.recharge
         };
+        const TT_URL = API.TimesTen + API.Recharge;
         $.ajax({
-            url : URL,
+            url : TT_URL,
             type : 'POST',
             data : JSON.stringify(data),
             contentType : 'application/json',
@@ -156,6 +189,7 @@ class Home extends React.Component {
     };
 
     handleSearchRecharge = (event) => {
+        this.refs.CompareExecutionTimeGraph.reset();
         this.setState({
             disableRechargeButton : true,
             disableCallingButton  : false
@@ -164,6 +198,7 @@ class Home extends React.Component {
     };
 
     handleSearchCalling = (event) => {
+        this.refs.CompareExecutionTimeGraph.reset();
         this.setState({
             disableCallingButton  : true,
             disableRechargeButton :false
@@ -222,6 +257,7 @@ class Home extends React.Component {
                     </RadioButtonGroup>
                 </Dialog>
                 {this.props.children}
+                <StoreModelCompare ref="CompareExecutionTimeGraph" />
             </div>
         );
     }
