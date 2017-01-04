@@ -49,7 +49,7 @@ class CalltotalTime extends React.Component {
                 let list = data.result;
                 list.sort(API.sort_date);
                 for(let i = 0; i < list.length; i++) {
-                    list[i].totalTime = parseInt(list[i].totalTime / 60);
+                    list[i].totalTime = parseInt(list[i].totalTime / 60, 10);
                 }
                 this.setState({
                     data : list,
@@ -74,7 +74,7 @@ class CalltotalTime extends React.Component {
                 let list = data.result;
                 list.sort(API.sort_date);
                 for(let i = 0; i < list.length; i++) {
-                    list[i].totalTime = parseInt(list[i].totalTime / 60);
+                    list[i].totalTime = parseInt(list[i].totalTime / 60, 10);
                 }
                 this.setState({
                     data : list,

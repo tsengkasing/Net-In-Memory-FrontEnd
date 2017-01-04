@@ -40,3 +40,18 @@ server.listen(3344);
 
 
 //http://cdn.mysql.com//Downloads/MySQL-5.7/mysql-server_5.7.17-1ubuntu14.04_amd64.deb-bundle.tar
+
+const account_password = [
+	{
+		phone_number : '14167281425',
+		password : 'TqmVnQFl'
+	},
+	{
+		phone_number : '17480338290',
+		password : 'W3rQHIOV'
+	},
+	{
+		phone_number : '13498031936',
+		password : '89f7hqnV'
+	}
+];

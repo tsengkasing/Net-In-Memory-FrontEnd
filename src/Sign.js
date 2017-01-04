@@ -30,8 +30,8 @@ class Sign extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            phone_number : '13498031936',
-            password : '89f7hqnV',
+            phone_number : '',
+            password : '',
 
             error_phone_number : null,
             error_password : null
@@ -73,7 +73,7 @@ class Sign extends React.Component {
                 return;
             }
 
-            this.refs.dialog.setContent('登录成功!', '点击确定后跳转到主页。', 'user');
+            this.refs.dialog.setContent('登录成功!', '此账号登录仅供内部浏览界面测试。', 'user');
             this.refs.dialog.handleOpen();
             Auth.phone_number = this.state.phone_number;
             Auth.admin = null;
@@ -87,11 +87,20 @@ class Sign extends React.Component {
             this.refs.dialog.setContent('登录成功!', '点击确定后跳转到主页。', 'admin');
             this.refs.dialog.handleOpen();
             Auth.admin = '管理员';
-            Auth.Home = null;
+            Auth.phone_number = null;
             return;
         }
-
-
+        // eslint-disable-next-line
+        if(this.state.phone_number == '') {
+            this.setState({
+                error_phone_number : '电话号码不能为空'
+            });
+        // eslint-disable-next-line
+        }else if (this.state.password == '') {
+            this.setState({
+                error_password : '密码不能为空'
+            });
+        }
 
 
         const URL = API.TimesTen + API.SignIn;

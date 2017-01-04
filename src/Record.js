@@ -21,7 +21,13 @@ const styles = {
         minWidth: '835px',
         overflowX : 'auto',
         overflowY : 'hidden',
-    }
+    },
+    alignRight : {
+        textAlign : 'right'
+    },
+    alignCenter : {
+        textAlign : 'center'
+    },
 };
 
 export default class Record extends React.Component {
@@ -168,9 +174,9 @@ export default class Record extends React.Component {
                         <TableRow>
                             <TableHeaderColumn tooltip="主叫">主叫</TableHeaderColumn>
                             <TableHeaderColumn tooltip="被叫">被叫</TableHeaderColumn>
-                            <TableHeaderColumn tooltip="呼叫时间">呼叫时间</TableHeaderColumn>
-                            <TableHeaderColumn tooltip="通话时长">通话时长</TableHeaderColumn>
-                            <TableHeaderColumn tooltip="消费金额">消费金额</TableHeaderColumn>
+                            <TableHeaderColumn tooltip="呼叫时间" style={styles.alignCenter}>呼叫时间</TableHeaderColumn>
+                            <TableHeaderColumn tooltip="通话时长" style={styles.alignRight}>通话时长</TableHeaderColumn>
+                            <TableHeaderColumn tooltip="消费金额" style={styles.alignRight}>消费金额</TableHeaderColumn>
                         </TableRow>
                     </TableHeader>
                     <TableBody
@@ -180,9 +186,9 @@ export default class Record extends React.Component {
                             <TableRow key={index}>
                                 <TableRowColumn>{row.caller}</TableRowColumn>
                                 <TableRowColumn>{row.called}</TableRowColumn>
-                                <TableRowColumn>{row.call_time}</TableRowColumn>
-                                <TableRowColumn>{this.parseDuration(row.dur_time)}</TableRowColumn>
-                                <TableRowColumn>{row.cost.toFixed(2)}元</TableRowColumn>
+                                <TableRowColumn style={styles.alignCenter}>{row.call_time}</TableRowColumn>
+                                <TableRowColumn style={styles.alignRight}>{this.parseDuration(row.dur_time)}</TableRowColumn>
+                                <TableRowColumn style={styles.alignRight}>{row.cost.toFixed(2)}元</TableRowColumn>
                             </TableRow>
                         ))}
                     </TableBody>
